@@ -1,7 +1,5 @@
 package net.braniumacademy.ex622;
 
-import java.util.regex.Pattern;
-
 public class BankAccount {
     private String cardNumber; // số thẻ
     private String accNumber; // số tài khoản

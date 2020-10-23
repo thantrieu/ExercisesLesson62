@@ -8,7 +8,7 @@ public class Test {
         System.out.println("Nhập tên của mèo: ");
         var name = input.nextLine();
         Cat myCat = new Cat(name);
-        System.out.println("Nhập tuổi của mèo: ");
+        System.out.println("Nhập tuổi của mèo(số nguyên): ");
         var ageStr = input.nextLine().trim();
         var age = Integer.parseInt(ageStr);
         try {
