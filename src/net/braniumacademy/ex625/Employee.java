@@ -1,5 +1,8 @@
 package net.braniumacademy.ex625;
 
+import net.braniumacademy.ex625.exceptions.InvalidNameException;
+import net.braniumacademy.ex625.exceptions.InvalidWorkingDayException;
+
 import java.util.Date;
 
 public class Employee extends Person {
@@ -18,27 +21,29 @@ public class Employee extends Person {
 
     public Employee(String empId, String duty, float salary,
                     float experience, float workingDay,
-                    float totalSalary, float bonus) {
+                    float totalSalary, float bonus)
+            throws InvalidWorkingDayException {
         setEmpId(empId);
         this.duty = duty;
         this.salary = salary;
         this.experience = experience;
         this.bonus = bonus;
-        this.workingDay = workingDay;
+        this.setWorkingDay(workingDay);
         this.totalSalary = totalSalary;
     }
 
     public Employee(String id, String fullName, String address,
                     Date dateOfBirth, String email, String phoneNumber,
                     String empId, String duty, float salary,
-                    float experience, float workingDay, float totalSalary, float bonus) {
+                    float experience, float workingDay, float totalSalary,
+                    float bonus) throws InvalidNameException, InvalidWorkingDayException {
         super(id, fullName, address, dateOfBirth, email, phoneNumber);
         setEmpId(empId);
         this.duty = duty;
-        this.salary = salary;
+        this.setSalary(salary);
         this.experience = experience;
         this.bonus = bonus;
-        this.workingDay = workingDay;
+        this.setWorkingDay(workingDay);
         this.totalSalary = totalSalary;
     }
 
@@ -101,8 +106,14 @@ public class Employee extends Person {
         return workingDay;
     }
 
-    public final void setWorkingDay(float workingDay) {
-        this.workingDay = workingDay;
+    public final void setWorkingDay(float workingDay)
+            throws InvalidWorkingDayException {
+        if(workingDay >= 0 && workingDay <= 30) {
+            this.workingDay = workingDay;
+        } else {
+            var msg = "Ngày công không hợp lệ: " + workingDay;
+            throw new InvalidWorkingDayException(msg, workingDay);
+        }
     }
 
     public final float getTotalSalary() {

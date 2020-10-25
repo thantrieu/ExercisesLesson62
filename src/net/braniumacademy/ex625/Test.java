@@ -1,6 +1,9 @@
 package net.braniumacademy.ex625;
 
 import net.braniumacademy.ex625.comparator.*;
+import net.braniumacademy.ex625.exceptions.InvalidDateFormatException;
+import net.braniumacademy.ex625.exceptions.InvalidNameException;
+import net.braniumacademy.ex625.exceptions.InvalidWorkingDayException;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,11 +49,18 @@ public class Test {
                             "\nXin mời chọn: ");
                     var slot = Integer.parseInt(input.nextLine());
                     if (slot == 1) {
-                        var emp = createNewEmployee(input);
-                        employees.add(emp); // thêm vào danh sách
+                        Employee emp = null;
+                        try {
+                            emp = createNewEmployee(input); // tạo thành công
+                            employees.add(emp); // thì thêm vào danh sách
+                        } catch (InvalidDateFormatException e) {
+                            e.printStackTrace();
+                        }
                     } else if (slot == 2) {
                         var emp = createManager(input);
-                        employees.add(emp); // thêm vào danh sách
+                        if (emp != null) { // nếu tạo manager thành công
+                            employees.add(emp); // thêm manager này vào danh sách
+                        }
                     }
                     break;
                 case 2:
@@ -467,20 +477,22 @@ public class Test {
             try {
                 start = dateFormat.parse(data[13]);
                 end = dateFormat.parse(data[14]);
-                // String id, String fullName, String address,
-                //                   Date dateOfBirth, String email, String phoneNumber,
-                //                   String empId, String duty, float salary, float experience,
-                //                   float workingDay, float totalSalary, float bonus,
                 return new Manager(id, fullName, address, dob,
                         email, phoneNum, empId, duty,
-                        salary, exp, workingDay, totalSalary, bonus, start, end);
-            } catch (ParseException e) {
+                        salary, exp, workingDay,
+                        totalSalary, bonus, start, end);
+            } catch (ParseException | InvalidNameException
+                    | InvalidWorkingDayException e) {
                 e.printStackTrace();
             }
         } else {
-            return new Employee(id, fullName, address, dob,
-                    email, phoneNum, empId, duty,
-                    salary, exp, workingDay, totalSalary, bonus);
+            try {
+                return new Employee(id, fullName, address, dob,
+                        email, phoneNum, empId, duty,
+                        salary, exp, workingDay, totalSalary, bonus);
+            } catch (InvalidNameException | InvalidWorkingDayException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
@@ -599,7 +611,13 @@ public class Test {
      * @return đối tượng giám đốc vừa tạo
      */
     private static Manager createManager(Scanner input) {
-        Employee employee = createNewEmployee(input);
+        Employee employee = null;
+        try {
+            employee = createNewEmployee(input);
+        } catch (InvalidDateFormatException e) {
+            e.printStackTrace();
+            return null;
+        }
         var format = "dd/MM/yyyy";
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         out.println("Ngày bắt đầu nhiệm kì(dd/MM/yyyy): ");
@@ -616,7 +634,14 @@ public class Test {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return new Manager(employee, start, end);
+        try {
+            return new Manager(employee, start, end);
+        } catch (InvalidNameException e) {
+            e.printStackTrace();
+        } catch (InvalidWorkingDayException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -625,7 +650,8 @@ public class Test {
      * @param input đối tượng của lớp Scanner
      * @return nhân viên với thông tin vừa nhập
      */
-    private static Employee createNewEmployee(Scanner input) {
+    private static Employee createNewEmployee(Scanner input)
+            throws InvalidDateFormatException {
         out.println("Số chứng minh thư: ");
         var pId = input.nextLine();
         out.println("Nhập tên nhân viên: ");
@@ -640,8 +666,14 @@ public class Test {
         var format = "dd/MM/yyyy";
         SimpleDateFormat dateFormat = new SimpleDateFormat(format);
         Date dob = null;
+        // nhập vào ngày tháng năm theo đúng định dạng, loại bỏ khoảng trắng đầu cuối
+        var dobStr = input.nextLine().trim();
+        if (!dobStr.matches("\\d{2}/\\d{2}/\\d{4}")) {
+            var msg = "Ngày sinh không đúng định dạng dd/MM/yyyy: " + dobStr;
+            throw new InvalidDateFormatException(msg, dobStr);
+        }
         try {
-            dob = dateFormat.parse(input.nextLine());
+            dob = dateFormat.parse(dobStr);
         } catch (ParseException e) {
             e.printStackTrace();
             dob = new Date(); // giả định nếu nhập sai thì ngày sinh là ngày hiện tại
@@ -655,7 +687,12 @@ public class Test {
         out.println("Số ngày làm việc trong tháng: ");
         var workingDay = Float.parseFloat(input.nextLine());
         // ban đầu chưa cần biết lương thưởng nên ta cho chúng = 0
-        return new Employee(pId, name, address, dob, email,
-                phoneNumber, null, duty, salary, exp, workingDay, 0, 0);
+        try {
+            return new Employee(pId, name, address, dob, email,
+                    phoneNumber, null, duty, salary, exp, workingDay, 0, 0);
+        } catch (InvalidNameException | InvalidWorkingDayException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

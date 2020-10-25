@@ -1,5 +1,7 @@
 package net.braniumacademy.ex625;
 
+import net.braniumacademy.ex625.exceptions.InvalidNameException;
+
 import java.util.Date;
 
 /**
@@ -17,7 +19,8 @@ public abstract class Person implements Comparable<Person> {
     }
 
     public Person(String id, String fullName, String address,
-                  Date dateOfBirth, String email, String phoneNumber) {
+                  Date dateOfBirth, String email, String phoneNumber)
+            throws InvalidNameException {
         this.id = id;
         this.setFullName(fullName);
         this.address = address;
@@ -77,9 +80,13 @@ public abstract class Person implements Comparable<Person> {
         return fullName;
     }
 
-    public final void setFullName(String fullName) {
+    public final void setFullName(String fullName) throws InvalidNameException {
         this.fullName = new FullName();
         if (fullName != null && fullName.length() > 0) {
+            if (!checkFullNameValid(fullName.toLowerCase())) {
+                var msg = "Họ tên không hợp lệ: " + fullName;
+                throw new InvalidNameException(msg, fullName);
+            }
             var words = fullName.split("\\s+"); // tách tại vị trí có dấu cách
             this.fullName.first = words[words.length - 1];
             this.fullName.last = words[0];
@@ -88,6 +95,26 @@ public abstract class Person implements Comparable<Person> {
                 this.fullName.mid += words[i] + " ";
             }
         }
+    }
+
+    /**
+     * Phương thức kiểm tra xem họ và tên có hợp lệ không.
+     * Họ tên hợp lệ nếu chỉ chứa kí tự chữ cái và dấu cách
+     *
+     * @param fullName họ và tên cần kiểm tra
+     * @return true nếu họ tên hợp lệ và ngược lại
+     */
+    protected boolean checkFullNameValid(String fullName) {
+        // những kí tự không hợp lệ trong tên
+        String checker = "0123456789+-*/=_]}[{'\";:/?.>,<)(&^%$#@!~`\\|";
+        for (int i = 0; i < fullName.length(); i++) {
+            for (int j = 0; j < checker.length(); j++) {
+                if (fullName.charAt(i) == checker.charAt(j)) {
+                    return false; // nếu tồn tại kí tự nào không hợp lệ thì false luôn
+                }
+            }
+        }
+        return true;
     }
 
     public final String getAddress() {

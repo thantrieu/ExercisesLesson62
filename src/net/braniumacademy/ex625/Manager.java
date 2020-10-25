@@ -1,5 +1,8 @@
 package net.braniumacademy.ex625;
 
+import net.braniumacademy.ex625.exceptions.InvalidNameException;
+import net.braniumacademy.ex625.exceptions.InvalidWorkingDayException;
+
 import java.util.Date;
 
 public class Manager extends Employee {
@@ -10,7 +13,8 @@ public class Manager extends Employee {
 
     }
 
-    public Manager(Employee emp, Date startDate, Date endDate) {
+    public Manager(Employee emp, Date startDate, Date endDate)
+            throws InvalidNameException, InvalidWorkingDayException {
         super(emp.getId(), emp.getFullNameString(), emp.getAddress(),
                 emp.getDateOfBirth(), emp.getEmail(), emp.getPhoneNumber(),
                 emp.getEmpId(), emp.getDuty(), emp.getSalary(),
@@ -22,7 +26,8 @@ public class Manager extends Employee {
 
     public Manager(String empId, String duty, float salary,
                    float experience, float workingDay, float totalSalary,
-                   float bonus, Date startDate, Date endDate) {
+                   float bonus, Date startDate, Date endDate)
+            throws InvalidWorkingDayException {
         super(empId, duty, salary, experience, workingDay, totalSalary, bonus);
         this.startDate = startDate;
         this.endDate = endDate;
@@ -32,7 +37,8 @@ public class Manager extends Employee {
                    Date dateOfBirth, String email, String phoneNumber,
                    String empId, String duty, float salary, float experience,
                    float workingDay, float totalSalary, float bonus,
-                   Date startDate, Date endDate) {
+                   Date startDate, Date endDate) throws InvalidNameException,
+            InvalidWorkingDayException {
         super(id, fullName, address, dateOfBirth, email,
                 phoneNumber, empId, duty, salary, experience,
                 workingDay, totalSalary, bonus);
